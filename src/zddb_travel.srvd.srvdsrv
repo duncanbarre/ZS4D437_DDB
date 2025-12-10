@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service definition for travel'
+define service Zddb_travel {
+  expose ZDDB_C_TRAVEL;
+}

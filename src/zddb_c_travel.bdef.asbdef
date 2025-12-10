@@ -1,0 +1,10 @@
+projection;
+strict ( 2 );
+
+define behavior for ZDDB_C_TRAVEL //alias <alias_name>
+use etag
+{
+  use create;
+  use update;
+  use delete;
+}
