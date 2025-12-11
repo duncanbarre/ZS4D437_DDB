@@ -6,6 +6,8 @@ CLASS lhc_travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
       IMPORTING REQUEST requested_authorizations FOR travel_ddb RESULT result.
+    METHODS cancel_travel FOR MODIFY
+      IMPORTING keys FOR ACTION travel_ddb~cancel_travel.
 
 ENDCLASS.
 
@@ -16,6 +18,12 @@ CLASS lhc_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_global_authorizations.
+  ENDMETHOD.
+
+  METHOD cancel_travel.
+  if 1 = 2.
+
+  endif.
   ENDMETHOD.
 
 ENDCLASS.

@@ -13,6 +13,8 @@ etag master ChangedAt
   delete;
   field ( readonly ) AgencyId, TravelId;
 
+  action cancel_travel;
+
   mapping for zddb_travel corresponding
   {
   AgencyID = agency_id;

@@ -57,7 +57,7 @@ annotate entity ZDDB_C_TRAVEL
     EndDate;
 
     @UI: {
-           lineItem:       [ { position: 10, importance: #HIGH } ],
+           lineItem:       [ { position: 10, importance: #HIGH, type: #FOR_ACTION, dataAction: 'cancel_travel', label: 'Cancel the Travel' } ],
            identification: [ { position: 70, importance: #HIGH } ]
          }
     Status;
