@@ -21,9 +21,30 @@ CLASS lhc_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD cancel_travel.
-  if 1 = 2.
+    READ ENTITIES OF zddb_r_travel IN LOCAL MODE
+      ENTITY travel_ddb
+         ALL FIELDS
+         WITH CORRESPONDING #( keys )
+      RESULT DATA(travels).
 
-  endif.
+
+
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-status <> 'C'.
+        MODIFY ENTITIES OF ZDDB_R_Travel IN LOCAL MODE
+        ENTITY travel_ddb
+        UPDATE FIELDS ( status )
+        WITH VALUE #( ( %tky = <travel>-%tky
+                        status = 'C' ) ).
+      ELSE.
+        APPEND VALUE #( %tky = <travel>-%tky )
+            TO failed-travel_ddb.
+        APPEND VALUE #( %tky = <travel>-%tky
+                        %msg = NEW zcm_ddb_travel( textid = zcm_ddb_travel=>already_canceled ) )
+           TO reported-travel_ddb.
+      ENDIF.
+    ENDLOOP.
+
   ENDMETHOD.
 
 ENDCLASS.
