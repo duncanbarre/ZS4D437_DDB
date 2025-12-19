@@ -10,6 +10,7 @@ define root view entity ZDDB_C_TRAVEL
     @Search.defaultSearchElement: true
     Description,
     @Search.defaultSearchElement: true
+    @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Customer_StdVH', element: 'CustomerID' } }]
     CustomerId,
     BeginDate,
     EndDate,

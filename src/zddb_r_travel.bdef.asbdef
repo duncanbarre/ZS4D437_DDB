@@ -2,18 +2,33 @@ managed implementation in class zbp_ddb_r_travel unique;
 strict ( 2 );
 
 define behavior for ZDDB_R_TRAVEL alias Travel_DDB //alias <alias_name>
+
 persistent table zddb_travel
 lock master
 authorization master ( instance )
 etag master ChangedAt
 //etag master <field_name>
+
+early numbering
 {
   create ( authorization : global );
-  update;
+  update ( features : instance );
   delete;
-  field ( readonly ) AgencyId, TravelId;
 
-  action cancel_travel;
+  field ( readonly ) AgencyId, TravelId;
+  field ( readonly ) Status, ChangedAt, ChangedBy;
+  field ( mandatory ) Description, EndDate;
+  field ( features : instance ) CustomerId, BeginDate;
+
+  action ( features : instance ) cancel_travel;
+
+  validation validateDescription on save { create; field Description; }
+  validation validateCustomer on save { create; update; field CustomerId; }
+  validation validateBeginDate on save { create; field BeginDate; }
+  validation validateEndDate on save { create; field EndDate; }
+  validation validateDateSequence on save { create; field BeginDate; field EndDate; }
+
+  determination determineStatus on modify { create; }
 
   mapping for zddb_travel corresponding
   {
