@@ -16,5 +16,6 @@ define root view entity ZDDB_C_TRAVEL
     EndDate,
     Status,
     ChangedAt,
-    ChangedBy
+    ChangedBy,
+    LocChangedAt
 }

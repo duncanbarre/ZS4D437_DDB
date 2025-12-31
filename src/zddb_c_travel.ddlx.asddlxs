@@ -71,4 +71,7 @@ annotate entity ZDDB_C_TRAVEL with
   @UI.hidden: true
   ChangedBy;
 
+  @UI.hidden: true
+  LocChangedAt;
+
 }

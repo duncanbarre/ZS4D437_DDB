@@ -1,22 +1,30 @@
 managed implementation in class zbp_ddb_r_travel unique;
 strict ( 2 );
+with draft;
 
-define behavior for ZDDB_R_TRAVEL alias Travel_DDB //alias <alias_name>
+define behavior for ZDDB_R_TRAVEL alias Travel_DDB
 
 persistent table zddb_travel
+draft table zddb_travel_d
 lock master
+total etag ChangedAt
 authorization master ( instance )
-etag master ChangedAt
-//etag master <field_name>
-
+etag master LocChangedAt
 early numbering
 {
+
   create ( authorization : global );
   update ( features : instance );
   delete;
 
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
   field ( readonly ) AgencyId, TravelId;
-  field ( readonly ) Status, ChangedAt, ChangedBy;
+  field ( readonly ) Status, ChangedAt, ChangedBy, LocChangedAt;
   field ( mandatory ) Description, EndDate;
   field ( features : instance ) CustomerId, BeginDate;
 
@@ -31,13 +39,14 @@ early numbering
   determination determineStatus on modify { create; }
 
   mapping for zddb_travel corresponding
-  {
-  AgencyID = agency_id;
-  TravelID = travel_id;
-  CustomerID = customer_id;
-  BeginDate = begin_date;
-  EndDate = end_date;
-  ChangedAt = changed_at;
-  ChangedBy = changed_by;
-  }
+    {
+      AgencyID     = agency_id;
+      TravelID     = travel_id;
+      CustomerID   = customer_id;
+      BeginDate    = begin_date;
+      EndDate      = end_date;
+      ChangedAt    = changed_at;
+      ChangedBy    = changed_by;
+      LocChangedAt = loc_changed_at;
+    }
 }

@@ -13,5 +13,7 @@ define root view entity ZDDB_R_TRAVEL
         @Semantics.systemDateTime.lastChangedAt: true
         changed_at  as ChangedAt,
         @Semantics.user.lastChangedBy: true
-        changed_by  as ChangedBy
+        changed_by  as ChangedBy,
+        @Semantics.systemDateTime.localInstanceLastChangedAt: true
+        loc_changed_at as LocChangedAt
   }
