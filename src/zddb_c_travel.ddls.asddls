@@ -14,6 +14,8 @@ define root view entity ZDDB_C_TRAVEL
     CustomerId,
     BeginDate,
     EndDate,
+    @UI.lineItem: [{label: 'Duration (days)'}]
+    Duration,
     Status,
     ChangedAt,
     ChangedBy,

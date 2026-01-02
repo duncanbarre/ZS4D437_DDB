@@ -4,7 +4,7 @@ with draft;
 
 define behavior for ZDDB_R_TRAVEL alias Travel_DDB
 
-persistent table zddb_travel
+persistent table zddb_travel ##UNMAPPED_FIELD
 draft table zddb_travel_d
 lock master
 total etag ChangedAt
@@ -18,13 +18,21 @@ early numbering
   delete;
 
   draft action Edit;
-  draft action Activate;
+  draft action Activate optimized;
   draft action Discard;
   draft action Resume;
-  draft determine action Prepare;
+
+  draft determine action Prepare
+  {
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+  }
 
   field ( readonly ) AgencyId, TravelId;
-  field ( readonly ) Status, ChangedAt, ChangedBy, LocChangedAt;
+  field ( readonly ) Status, ChangedAt, ChangedBy, LocChangedAt, Duration;
   field ( mandatory ) Description, EndDate;
   field ( features : instance ) CustomerId, BeginDate;
 
@@ -37,6 +45,31 @@ early numbering
   validation validateDateSequence on save { create; field BeginDate; field EndDate; }
 
   determination determineStatus on modify { create; }
+
+  determine action checkCustomer
+  {
+    validation validateCustomer;
+  }
+
+  determination determineDuration on save { field BeginDate, EndDate; }
+
+  determine action adjustDuration
+  {
+    validation validateBeginDate;
+    validation validateEnddate;
+    validation validateDateSequence;
+    determination determineDuration;
+  }
+
+  side effects
+  { determine action checkCustomer
+    executed on field CustomerId
+    affects messages;
+
+    determine action adjustDuration
+    executed on field BeginDate,
+    field EndDate
+    affects field Duration, messages; }
 
   mapping for zddb_travel corresponding
     {

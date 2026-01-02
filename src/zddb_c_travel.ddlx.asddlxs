@@ -54,7 +54,13 @@ annotate entity ZDDB_C_TRAVEL with
          identification: [ { position: 60, importance: #LOW } ]
        }
   EndDate;
-
+    
+  @UI: { 
+        lineItem:       [ { position: 55, importance: #LOW } ],
+        identification: [ { position: 65, importance: #LOW } ]
+  }  
+  Duration;  
+  
   @UI: {
       lineItem: [
           { position: 60, importance: #HIGH }, // Show Status as a normal field

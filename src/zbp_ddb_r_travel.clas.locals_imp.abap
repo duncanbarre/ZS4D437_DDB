@@ -22,8 +22,16 @@ CLASS lhc_travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys FOR travel_ddb~determinestatus.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR travel_ddb RESULT result.
+    METHODS determineduration FOR DETERMINE ON SAVE
+      IMPORTING keys FOR travel_ddb~determineduration.
     METHODS earlynumbering_create FOR NUMBERING
       IMPORTING entities FOR CREATE travel_ddb.
+
+    CONSTANTS:
+      c_area    TYPE string VALUE 'DESC',
+      begindate TYPE string VALUE 'begindate',
+      enddate   TYPE string VALUE 'enddate',
+      sequence  TYPE string VALUE 'sequence'.
 
 
 ENDCLASS.
@@ -90,12 +98,18 @@ CLASS lhc_travel IMPLEMENTATION.
       RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+
+
+      APPEND VALUE #( %tky = <travel>-%tky
+                      %state_area = c_area ) TO reported-travel_ddb.
+
       IF <travel>-Description IS INITIAL.
         APPEND VALUE #( %tky = <travel>-%tky )
             TO failed-travel_ddb.
         APPEND VALUE #( %tky = <travel>-%tky
                         %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
-                        %element-description = if_abap_behv=>mk-on )
+                        %element-description = if_abap_behv=>mk-on
+                        %state_area = c_area )
             TO reported-travel_ddb.
       ENDIF.
     ENDLOOP.
@@ -109,12 +123,17 @@ CLASS lhc_travel IMPLEMENTATION.
       RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+
+      APPEND VALUE #( %tky = <travel>-%tky
+                        %state_area = c_area ) TO reported-travel_ddb.
+
       IF <travel>-CustomerID IS INITIAL.
         APPEND VALUE #( %tky = <travel>-%tky )
             TO failed-travel_ddb.
         APPEND VALUE #( %tky = <travel>-%tky
                         %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
-                        %element-customerid = if_abap_behv=>mk-on )
+                        %element-customerid = if_abap_behv=>mk-on
+                        %state_area = c_area )
             TO reported-travel_ddb.
       ELSE.
         SELECT SINGLE customerId
@@ -128,7 +147,8 @@ CLASS lhc_travel IMPLEMENTATION.
           APPEND VALUE #( %tky = <travel>-%tky
                           %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>customer_not_exist
                                                      customerid = <travel>-CustomerID )
-                          %element-customerid = if_abap_behv=>mk-on )
+                          %element-customerid = if_abap_behv=>mk-on
+                          %state_area = c_area )
               TO reported-travel_ddb.
         ENDIF.
 
@@ -144,12 +164,16 @@ CLASS lhc_travel IMPLEMENTATION.
     RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      APPEND VALUE #( %tky = <travel>-%tky
+                     %state_area = begindate ) TO reported-travel_ddb.
+
       IF <travel>-BeginDate IS INITIAL.
         APPEND VALUE #( %tky = <travel>-%tky )
             TO failed-travel_ddb.
         APPEND VALUE #( %tky = <travel>-%tky
                         %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
-                        %element-begindate = if_abap_behv=>mk-on )
+                        %element-begindate = if_abap_behv=>mk-on
+                        %state_area = begindate )
             TO reported-travel_ddb.
       ELSE.
         IF <travel>-BeginDate < cl_abap_context_info=>get_system_date( ).
@@ -158,7 +182,8 @@ CLASS lhc_travel IMPLEMENTATION.
           APPEND VALUE #( %tky = <travel>-%tky
                           %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>begin_date_past
                                                      begindate = <travel>-BeginDate )
-                          %element-begindate = if_abap_behv=>mk-on )
+                          %element-begindate = if_abap_behv=>mk-on
+                          %state_area = begindate )
               TO reported-travel_ddb.
         ENDIF.
 
@@ -174,12 +199,17 @@ CLASS lhc_travel IMPLEMENTATION.
      RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      APPEND VALUE #( %tky = <travel>-%tky
+                  %state_area = enddate ) TO reported-travel_ddb.
+
+
       IF <travel>-EndDate IS INITIAL.
         APPEND VALUE #( %tky = <travel>-%tky )
             TO failed-travel_ddb.
         APPEND VALUE #( %tky = <travel>-%tky
                         %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
-                        %element-EndDate = if_abap_behv=>mk-on )
+                        %element-EndDate = if_abap_behv=>mk-on
+                        %state_area = enddate )
             TO reported-travel_ddb.
       ELSE.
         IF <travel>-EndDate < cl_abap_context_info=>get_system_date( ).
@@ -187,7 +217,8 @@ CLASS lhc_travel IMPLEMENTATION.
               TO failed-travel_ddb.
           APPEND VALUE #( %tky = <travel>-%tky
                           %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>end_date_past )
-                          %element-EndDate = if_abap_behv=>mk-on )
+                          %element-EndDate = if_abap_behv=>mk-on
+                          %state_area = enddate )
               TO reported-travel_ddb.
         ENDIF.
 
@@ -203,6 +234,9 @@ CLASS lhc_travel IMPLEMENTATION.
      RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      APPEND VALUE #( %tky = <travel>-%tky
+                   %state_area = enddate ) TO reported-travel_ddb.
+
       IF <travel>-EndDate < <travel>-BeginDate.
 
         APPEND VALUE #( %tky = <travel>-%tky )
@@ -210,7 +244,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky = <travel>-%tky
                         %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>dates_wrong_sequence )
-                        %element = VALUE #( BeginDate = if_abap_behv=>mk-on EndDate = if_abap_behv=>mk-on ) )
+                        %element = VALUE #( BeginDate = if_abap_behv=>mk-on EndDate = if_abap_behv=>mk-on
+                         )
+                        %state_area = sequence  )
         TO reported-travel_ddb.
 
       ENDIF.
@@ -263,6 +299,23 @@ CLASS lhc_travel IMPLEMENTATION.
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
       APPEND CORRESPONDING #( <travel> ) TO result ASSIGNING FIELD-SYMBOL(<result>).
 
+
+      IF <travel>-%is_draft = if_abap_behv=>mk-on.
+        READ ENTITIES OF zddb_r_travel IN LOCAL MODE
+        ENTITY travel_ddb
+        FIELDS ( BeginDate EndDate )
+        WITH VALUE #( ( %key = <travel>-%key ) )
+        RESULT DATA(travels_active).
+
+        IF travels_active IS NOT INITIAL.
+          <travel>-BeginDate = travels_active[ 1 ]-begindate.
+          <travel>-EndDate = travels_active[ 1 ]-enddate.
+        ELSE.
+          CLEAR <travel>-BeginDate.
+          CLEAR <travel>-EndDate.
+        ENDIF.
+      ENDIF.
+
       IF <travel>-Status = 'C' OR ( <travel>-EndDate IS NOT INITIAL AND <travel>-EndDate < cl_abap_context_info=>get_system_date( ) ).
         <result>-%update = if_abap_behv=>fc-o-disabled.
         <result>-%action-cancel_travel = if_abap_behv=>fc-o-disabled.
@@ -280,6 +333,26 @@ CLASS lhc_travel IMPLEMENTATION.
       ENDIF.
 
     ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD determineDuration.
+    READ ENTITIES OF zddb_r_travel IN LOCAL MODE
+    ENTITY travel_ddb
+       FIELDS ( BeginDate EndDate )
+       WITH CORRESPONDING #( keys )
+      RESULT DATA(travels).
+
+
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      <travel>-Duration = <travel>-EndDate - <travel>-BeginDate.
+    ENDLOOP.
+
+    MODIFY ENTITIES OF zddb_r_travel IN LOCAL MODE
+      ENTITY travel_ddb
+      UPDATE FIELDS ( Duration )
+      WITH CORRESPONDING #( travels ).
+
 
   ENDMETHOD.
 
