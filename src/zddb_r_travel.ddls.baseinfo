@@ -6,7 +6,9 @@
 "ZDDB_TRAVEL"
 ],
 "ASSOCIATED":
-[],
+[
+"ZDDB_R_TRAVELITEM"
+],
 "BASE":
 [],
 "ANNO_REF":

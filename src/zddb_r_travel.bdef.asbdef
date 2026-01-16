@@ -71,6 +71,8 @@ early numbering
     field EndDate
     affects field Duration, messages; }
 
+ association _TravelItem { create; with draft; }
+
   mapping for zddb_travel corresponding
     {
       AgencyID     = agency_id;
@@ -81,5 +83,39 @@ early numbering
       ChangedAt    = changed_at;
       ChangedBy    = changed_by;
       LocChangedAt = loc_changed_at;
+    }
+}
+
+define behavior for ZDDB_R_TRAVELITEM alias Item
+persistent table zddb_tritem
+draft table zddb_tritem_d
+authorization dependent by _Travel
+lock dependent by _Travel
+etag master LocChangedAt
+{
+  update;
+  delete;
+
+  field ( readonly, numbering : managed )
+  ItemUuid; field ( readonly )
+  AgencyId,
+  TravelId;
+
+  association _Travel { with draft; }
+
+  mapping for zddb_tritem corresponding
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
     }
 }
