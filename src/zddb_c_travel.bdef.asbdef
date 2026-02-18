@@ -19,4 +19,15 @@ use etag
 
   use action checkCustomer;
   use action adjustDuration;
+
+  use association _TravelItem { create; with draft; }
+
+  }
+
+  define behavior for zddb_c_travelitem
+  use etag
+  {
+  use update;
+  use delete;
+  use association _Travel { with draft; }
   }

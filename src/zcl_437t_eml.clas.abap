@@ -15,7 +15,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_437t_eml IMPLEMENTATION.
+CLASS ZCL_437T_EML IMPLEMENTATION.
 
 
   METHOD if_oo_adt_classrun~main.

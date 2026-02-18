@@ -2,7 +2,7 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @Metadata.allowExtensions: true
 define view entity ZDDB_C_TravelItem
-  provider contract transactional_query
+ 
   as projection on ZDDB_R_TRAVELITEM
   {
     key ItemUuid,
@@ -71,5 +71,5 @@ define view entity ZDDB_C_TravelItem
         ChangedAt,
         ChangedBy,
         LocChangedAt,
-        _Travel        
+        _Travel : redirected to parent ZDDB_C_TRAVEL             
   }
