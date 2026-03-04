@@ -125,7 +125,8 @@ etag master LocChangedAt
       LocChangedAt       = loc_changed_at;
     }
 
-  mapping for /lrn/437_s_tritem corresponding
+  mapping for /lrn/437_s_tritem
+    control /LRN/437_S_TRITEMX corresponding
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;
@@ -139,5 +140,6 @@ etag master LocChangedAt
       ChangedAt          = changed_at;
       ChangedBy          = changed_by;
       LocChangedAt       = loc_changed_at;
+
     }
 }
