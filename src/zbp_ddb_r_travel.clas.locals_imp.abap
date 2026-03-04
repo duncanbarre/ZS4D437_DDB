@@ -1,3 +1,122 @@
+CLASS lsc_zddb_r_travel DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_zddb_r_travel IMPLEMENTATION.
+
+  METHOD save_modified.
+
+    DATA(model) = NEW /lrn/cl_s4d437_tritem( 'zddb_tritem' ).
+
+
+    LOOP AT delete-item ASSIGNING FIELD-SYMBOL(<item_d>).
+      model->delete_item( <item_d>-ItemUuid ).
+    ENDLOOP.
+
+    LOOP AT create-item ASSIGNING FIELD-SYMBOL(<item_c>).
+      model->create_item( CORRESPONDING #( <item_c> ) ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lhc_item DEFINITION INHERITING FROM cl_abap_behavior_handler.
+
+  PRIVATE SECTION.
+
+    METHODS validateFlightDate FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Item~validateFlightDate.
+    METHODS determineTravelDates FOR DETERMINE ON SAVE
+      IMPORTING keys FOR Item~determineTravelDates.
+
+ENDCLASS.
+
+CLASS lhc_item IMPLEMENTATION.
+
+  METHOD validateFlightDate.
+    READ ENTITIES OF zddb_r_travel IN LOCAL MODE
+     ENTITY Item
+        FIELDS ( FlightDate AgencyId TravelId )
+        WITH CORRESPONDING #( keys )
+     RESULT DATA(items).
+
+    LOOP AT items ASSIGNING FIELD-SYMBOL(<item>).
+      APPEND VALUE #( %tky = <item>-%tky
+                       %state_area = 'FLIGHTDATE' )
+    TO reported-item.
+
+      IF <item>-FlightDate IS INITIAL.
+        APPEND VALUE #( %tky = <item>-%tky )
+            TO failed-item.
+        APPEND VALUE #( %tky = <item>-%tky
+                        %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
+                        %element-FlightDate = if_abap_behv=>mk-on
+                        %state_area = 'FLIGHTDATE'
+                        %path-travel_ddb  = CORRESPONDING #( <item> ) )
+           TO reported-item.
+      ELSEIF <item>-FlightDate <  cl_abap_context_info=>get_system_date( ).
+        APPEND VALUE #( %tky = <item>-%tky )
+            TO failed-item.
+        APPEND VALUE #( %tky = <item>-%tky
+                        %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>begin_date_past )
+                        %element-FlightDate = if_abap_behv=>mk-on
+                        %state_area = 'FLIGHTDATE'
+                        %path-travel_ddb  = CORRESPONDING #( <item> ) )
+            TO reported-item.
+
+      ENDIF.
+    ENDLOOP.
+
+
+  ENDMETHOD.
+
+  METHOD determineTravelDates.
+    READ ENTITIES OF zddb_r_travel IN LOCAL MODE
+      ENTITY Item
+         FIELDS ( FlightDate )
+         WITH CORRESPONDING #( keys )
+         RESULT DATA(items)
+         BY \_Travel
+         FIELDS ( BeginDate EndDate )
+         WITH CORRESPONDING #( keys )
+         RESULT DATA(travels)
+         LINK DATA(link).
+
+
+    LOOP AT items ASSIGNING FIELD-SYMBOL(<item>).
+      ASSIGN travels[ KEY id %tky =
+      link[ KEY id source-%tky = <item>-%tky ]-target-%tky ]
+      TO FIELD-SYMBOL(<travel>).
+
+      IF <travel>-EndDate < <item>-FlightDate.
+        <travel>-EndDate = <item>-FlightDate.
+      ENDIF.
+
+      IF <item>-FlightDate > cl_abap_context_info=>get_system_date( )
+      AND <item>-FlightDate < <travel>-BeginDate.
+        <travel>-BeginDate = <item>-FlightDate.
+      ENDIF.
+
+      MODIFY ENTITIES OF ZDDB_R_Travel IN LOCAL MODE ENTITY Travel_DDB
+      UPDATE FIELDS ( BeginDate EndDate )
+      WITH CORRESPONDING #( travels ).
+
+    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zddb_r_travel IN LOCAL MODE
+*      ENTITY Item
+*      UPDATE FIELDS ( TravelID )
+*      WITH CORRESPONDING #( items ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
