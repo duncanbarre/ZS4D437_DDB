@@ -1,0 +1,20 @@
+CLASS zcl_ddb_handler DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC
+  for events of zddb_r_travel.
+
+  PUBLIC SECTION.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_ddb_handler IMPLEMENTATION.
+
+
+ENDCLASS.
+
+
+

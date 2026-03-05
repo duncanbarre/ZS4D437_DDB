@@ -11,7 +11,10 @@ total etag ChangedAt
 authorization master ( instance )
 etag master LocChangedAt
 early numbering
+with additional save
 {
+
+  event TravelCreated;
 
   create ( authorization : global );
   update ( features : instance );

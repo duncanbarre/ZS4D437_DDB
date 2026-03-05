@@ -42,16 +42,22 @@ CLASS lsc_zddb_r_travel IMPLEMENTATION.
     ENDLOOP.
 
     LOOP AT update-item ASSIGNING FIELD-SYMBOL(<item_u>).
-      data(msg_u) = model->update_item(
+      DATA(msg_u) = model->update_item(
          i_item = CORRESPONDING #( <item_u> MAPPING FROM ENTITY )
          i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY USING CONTROL ) ).
 
-      if msg_u is not initial.
+      IF msg_u IS NOT INITIAL.
         APPEND VALUE #( %tky-itemuuid = <item_d>-ItemUuid
                         %msg = map_message( msg_u ) )
             TO reported-item.
-      endif.
+      ENDIF.
     ENDLOOP.
+
+    IF create-travel_ddb IS NOT INITIAL.
+      RAISE ENTITY EVENT zddb_r_travel~TravelCreated
+          FROM CORRESPONDING #( create-travel_ddb ).
+    ENDIF.
+
 
   ENDMETHOD.
 
