@@ -54,8 +54,13 @@ CLASS lsc_zddb_r_travel IMPLEMENTATION.
     ENDLOOP.
 
     IF create-travel_ddb IS NOT INITIAL.
-      RAISE ENTITY EVENT zddb_r_travel~TravelCreated
-          FROM CORRESPONDING #( create-travel_ddb ).
+      DATA event_in TYPE TABLE FOR EVENT ZDDB_R_Travel~TravelCreated.
+      LOOP AT create-travel_ddb ASSIGNING FIELD-SYMBOL(<new_travel>).
+        APPEND VALUE #( AgencyId = <new_travel>-AgencyId
+                        TravelId = <new_travel>-TravelId
+                        origin = 'ZDDB_R_TRAVEL' ) TO event_in.
+      ENDLOOP.
+      RAISE ENTITY EVENT ZDDB_R_Travel~TravelCreated FROM event_in.
     ENDIF.
 
 
